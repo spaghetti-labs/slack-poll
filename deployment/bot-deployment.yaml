@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slack-poll-bot
+spec:
+  selector:
+    matchLabels:
+      app: slack-poll-bot
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: slack-poll-bot
+    spec:
+      containers:
+        - name: slack-poll-bot
+          image: gcr.io/contenta-ai/slack-poll:main
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              memory: 64Mi
+              cpu: 50m
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          env:
+            - name: SLACK_POLL_DB
+              value: /data/db.sqlite
+            - name: SLACK_POLL_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: slack-poll
+                  key: signing-secret
+            - name: SLACK_POLL_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-poll
+                  key: bot-token
+            - name: SLACK_POLL_APP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-poll
+                  key: app-token
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: slack-poll-bot
