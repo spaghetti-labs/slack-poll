@@ -16,7 +16,7 @@ jobs:
   deploy-to-gcr:
     runs-on: ubuntu-latest
     needs: build-and-push-to-gcr
-    if: {{ github.ref_name == 'main' }}
+    if: ${{ github.ref_name == 'main' }}
     steps:
       - uses: actions-hub/kubectl@master
         env:
