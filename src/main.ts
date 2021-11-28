@@ -21,6 +21,8 @@ Yargs(hideBin(process.argv))
     .completion()
     .help()
 
+    .env('SLACK_POLL')
+
     .option('db', {
         default: 'db.sqlite',
         demandOption: true,

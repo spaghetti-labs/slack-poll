@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+  slack-poll:
+    image: gcr.io/contenta-ai/slack-poll:latest
+    volumes:
+      - data:/data
+    env_file:
+      - .env
+volumes:
+  data:
