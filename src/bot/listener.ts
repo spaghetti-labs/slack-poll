@@ -1,7 +1,10 @@
-import { MessageBlock } from "@slack/web-api/dist/response/ChatPostMessageResponse";
+import { SectionBlock } from "@slack/types";
 import { v4 } from "uuid";
+import { OptionEntity } from "../entities/option";
+import { PollEntity } from "../entities/poll";
+import { VoteEntity } from "../entities/vote";
+import { VoteRightEntity } from "../entities/vote-right";
 import { getSlackApp } from "../slack";
-import { Poll } from "./memory-poll";
 
 export async function listen(
     port: number,
@@ -23,7 +26,7 @@ export async function listen(
             return
         }
 
-        const options = blocks.filter(
+        const optionTexts: string[] = blocks.filter(
             block => block.type === 'rich_text'
         ).flatMap(
             block => block.elements
@@ -41,47 +44,115 @@ export async function listen(
             element => element.text
         )
 
-        if (options.length < 2) {
+        if (optionTexts.length < 2) {
             return
         } else {
-            const poll = Poll.createPoll()
-            for (const option of options) {
-                poll.addOption(option)
-            }
+            const { members } = await app.client.conversations.members({
+                channel: shortcut.channel.id,
+            })
+
+            const options = optionTexts.map(
+                option => OptionEntity.create({
+                    id: v4(),
+                    text: option,
+                })
+            )
+            const voteRights = members.map(
+                member => VoteRightEntity.create({
+                    id: v4(),
+                    userId: member,
+                })
+            )
+            const poll = PollEntity.create({
+                id: v4(),
+                options,
+                voteRights,
+            })
+            await poll.save()
 
             await say({
                 text: 'Poll',
                 blocks: [
-                    {
-                        type: "section",
-                        text: {
-                            text: "Poll:",
-                            type: "plain_text",
-                        },
-                    },
-                    {
-                        label: {
-                            text: "Choice",
-                            type: "plain_text",
-                        },
-                        type: "input",
-                        element: {
-                            type: "radio_buttons",
-                            options: poll.options.map(
-                                option => ({
-                                    text: {
-                                        text: option.text,
+                    ...options.map(
+                        option => ({
+                            type: "section",
+                            text: {
+                                text: option.text,
+                                type: "plain_text",
+                            },
+                            accessory: {
+                                type: "button",
+                                action_id: `poll/${poll.id}/send`,
+                                value: option.id,
+                                text: {
+                                    text: "Vote",
+                                    type: "plain_text",
+                                },
+                                confirm: {
+                                    style: 'primary',
+                                    title: {
+                                        text: 'Vote',
                                         type: 'plain_text',
-                                    }
-                                })
-                            )
-                        }
-                    },
+                                    },
+                                    text: {
+                                        text: 'Vote cannot be reverted. Are you sure to send?',
+                                        type: 'plain_text',
+                                    },
+                                    confirm: {
+                                        text: 'Send vote',
+                                        type: 'plain_text',
+                                    },
+                                    deny: {
+                                        text: 'Cancel',
+                                        type: 'plain_text',
+                                    },
+                                },
+                            },
+                        }) as SectionBlock
+                    ),
                 ],
             })
 
             await ack()
         }
+    })
+
+    app.action(/^poll\/.*\/send$/, async ({ action, ack, body: { user } }) => {
+        if (action.type !== 'button') {
+            return
+        }
+        
+        const optionId = action.value
+        const userId = user.id
+
+        const option = await OptionEntity.findOne(optionId, {relations: ['poll']})
+        if (option == null) {
+            return
+        }
+
+        const poll = option.poll
+        const voteRight = await VoteRightEntity.findOne({
+            where: {
+                poll,
+            },
+            relations: ['vote'],
+        })
+
+        if (voteRight == null) {
+            return
+        }
+
+        if (voteRight.vote != null) {
+            return
+        }
+
+        const vote = VoteEntity.create({
+            voteRight,
+            option,
+        })
+        await VoteEntity.save(vote)
+
+        await ack()
     })
 
     await app.start(port)

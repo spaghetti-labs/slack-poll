@@ -2,8 +2,8 @@ default:
     type: sqlite
     database: db.sqlite
     entities:
-        - src/engine/entities/*.ts
+        - src/entities/*.ts
     migrations:
-        - src/engine/migrations/index.ts
+        - src/migrations/index.ts
     cli:
-        migrationsDir: src/engine/migrations
+        migrationsDir: src/migrations
