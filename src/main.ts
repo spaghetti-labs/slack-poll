@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
+import { config } from "dotenv"
+config()
+
 import Yargs from "yargs"
 import { hideBin } from "yargs/helpers"
-import { listen } from "./bot/listener"
+import { listen } from "./bot"
 import { connectDB } from "./db"
 import { connectSlack } from "./slack"
 
@@ -46,17 +49,12 @@ Yargs(hideBin(process.argv))
         argv["bot-token"],
     ))
 
-    .option('port', {
-        default: 3000,
-        demandOption: true,
-    })
-
     .command(
         '$0',
         'Run the bot',
         args => args,
-        async argv => {
-            await listen(argv.port)
+        async () => {
+            await listen()
         }
     )
 

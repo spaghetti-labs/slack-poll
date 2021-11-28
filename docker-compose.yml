@@ -6,5 +6,7 @@ services:
       - data:/data
     env_file:
       - .env
+    environment:
+      SLACK_POLL_DB: /data/db.sqlite
 volumes:
   data:

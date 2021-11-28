@@ -1,0 +1,12 @@
+import { getSlackApp } from "../slack"
+
+export async function listen() {
+    const app = getSlackApp()
+
+    await import("./shortcut")
+    await import("./send")
+    await import("./reveal")
+
+    await app.start()
+    console.log('⚡️ Slack-Poll bot is running!');
+}
