@@ -1,4 +1,4 @@
-import { BaseEntity, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { OptionEntity } from "./option";
 import { VoteRightEntity } from "./vote-right";
 
@@ -6,6 +6,12 @@ import { VoteRightEntity } from "./vote-right";
 export class PollEntity extends BaseEntity {
     @PrimaryColumn('uuid')
     id: string
+
+    @Column('varchar', {
+        name: 'user_id',
+        nullable: false,
+    })
+    userId: string
 
     @OneToMany(() => OptionEntity, option => option.poll, { cascade: true })
     options: OptionEntity[]

@@ -23,6 +23,6 @@ export class VoteRightEntity extends BaseEntity {
     })
     poll: PollEntity
 
-    @OneToOne(() => VoteEntity, vote => vote.voteRight)
+    @OneToOne(() => VoteEntity, vote => vote.voteRight, {eager: true})
     vote: VoteEntity
 }
