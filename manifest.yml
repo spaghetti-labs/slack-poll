@@ -11,6 +11,10 @@ features:
     - name: Start new poll
       type: message
       callback_id: poll/create-poll
+      description: Creates a new poll in the current channel from the message
+    - name: Start new poll
+      type: global
+      callback_id: poll/create-poll-form
       description: Creates a new poll in the current channel
 oauth_config:
   scopes:

@@ -3,7 +3,9 @@ import { getSlackApp } from "../slack"
 export async function listen() {
     const app = getSlackApp()
 
-    await import("./shortcut")
+    await import("./global-shortcut")
+    await import("./message-shortcut")
+    await import("./form")
     await import("./send")
     await import("./reveal")
 
