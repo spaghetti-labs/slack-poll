@@ -18,6 +18,7 @@ jobs:
     needs: build-and-push-to-gcr
     if: ${{ github.ref_name == 'main' }}
     steps:
+      - uses: actions/checkout@v2
       - uses: actions-hub/kubectl@master
         env:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
