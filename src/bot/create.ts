@@ -17,8 +17,6 @@ export async function createPoll(
     }
 ) {
     const app = getSlackApp()
-    
-    const mentionOwner = `<@${userId}>`
 
     const { members } = await app.client.conversations.members({
         channel: channelId,
@@ -52,7 +50,7 @@ export async function createPoll(
                 type: "section",
                 text: {
                     type: "mrkdwn",
-                    text: mentionOwner + " has started a new poll!",
+                    text: `<@${userId}> has started a new poll!`
                 }
             },
             ...options.map(
