@@ -19,13 +19,19 @@ jobs:
     if: ${{ github.ref_name == 'main' }}
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-hub/kubectl@master
+      - uses: ameydev/gke-kubectl-action@master
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_SERVICE_KEY }}
+          CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
+          ZONE_NAME: ${{ secrets.GKE_ZONE_NAME }}
         with:
           args: apply -k deployment
-      - uses: actions-hub/kubectl@master
+      - uses: ameydev/gke-kubectl-action@master
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_SERVICE_KEY }}
+          CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
+          ZONE_NAME: ${{ secrets.GKE_ZONE_NAME }}
         with:
           args: rollout restart deployment/slack-poll-bot
