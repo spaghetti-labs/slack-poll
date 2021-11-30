@@ -46,6 +46,13 @@ export async function createPoll(
         channel: channelId,
         text: 'Poll',
         blocks: [
+            {
+                type: "section",
+                text: {
+                    type: "mrkdwn",
+                    text: `<@${userId}> has started a new poll!`
+                }
+            },
             ...options.map(
                 option => ({
                     type: "section",
