@@ -18,38 +18,17 @@ export async function createPoll(
 ) {
     const app = getSlackApp()
 
-    var { members }: any = await app.client.conversations.members({
-      // Getting conversation's members list
-      channel: channelId,
+    const users = await app.client.users.list() // Getting all users list to users variable
+
+    const verifiedUsers = users.members.filter(function (el){ // Filtering users which is bots and USLACKBOT
+        return el.is_bot == false && el.id != "USLACKBOT"
+    }).map((m) => m.id) // Getting IDs to verifiedUsers variable
+
+    const {members} = await app.client.conversations.members({ // Getting conversation's members list
+        channel: channelId,
     })
-  
-    const users = await app.client.users.list() // Getting all users list
-    const allUsers = users.members.map((m) => m.id) // Getting all user's ID list
-    const allUsersIsBot = users.members.map((m) => m.is_bot) // Getting all users's is_bot parameters
-  
-    var verifiedUsers = []
-    var conversationMembers = []
-  
-    for (let i = 0; i < allUsersIsBot.length; i++) {
-      // Getting users which is not bot with query is_bot: false
-      if (allUsersIsBot[i] == false) {
-        verifiedUsers.push(allUsers[i]) // Adding results to verifiedUsers array
-      }
-    }
-  
-    for (let x = 0; x < members.length; x++) {
-      // Eliminating users which is not in the conversation
-      for (let i = 0; i < verifiedUsers.length; i++) {
-        // It is necessary because conversations.members API method is not giving conversation's is_bot info
-        if (members[x] == verifiedUsers[i]) {
-          conversationMembers.push(members[x]) // Adding results to conversationMembers array
-        }
-      }
-    }
-
-    var conversationMembers = conversationMembers.filter(item => item !== "USLACKBOT") // Removing "USLACKBOT" item from array because It is fake bot
-
-    var members: any = conversationMembers // Changing members variable with updated and filtered one
+    
+    const conversationMembers = verifiedUsers.filter(item => members.includes(item)) // Filtering not member in conversation
 
     const options = optionTexts.map(
         option => OptionEntity.create({
@@ -57,7 +36,7 @@ export async function createPoll(
             text: option,
         })
     )
-    const voteRights = members.map(
+    const voteRights = conversationMembers.map(
         member => VoteRightEntity.create({
             id: v4(),
             userId: member,
