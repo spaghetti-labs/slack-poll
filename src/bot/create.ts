@@ -18,9 +18,15 @@ export async function createPoll(
 ) {
     const app = getSlackApp()
 
-    const { members } = await app.client.conversations.members({
+    const users = await app.client.users.list() // Getting all workspace's users list
+
+    const verifiedUsers = users.members.filter(user => user.is_bot == false && user.id != "USLACKBOT").map((m) => m.id) // Filtering users which is bots and USLACKBOT
+
+    const {members} = await app.client.conversations.members({ // Getting conversation's members list
         channel: channelId,
     })
+    
+    const conversationMembers = verifiedUsers.filter(item => members.includes(item)) // Filtering non member in conversation
 
     const options = optionTexts.map(
         option => OptionEntity.create({
@@ -28,7 +34,7 @@ export async function createPoll(
             text: option,
         })
     )
-    const voteRights = members.map(
+    const voteRights = conversationMembers.map(
         member => VoteRightEntity.create({
             id: v4(),
             userId: member,
