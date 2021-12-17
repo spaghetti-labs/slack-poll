@@ -51,6 +51,42 @@ app.shortcut("poll/create-poll-form", async ({ shortcut, ack }) => {
                         initial_value: "Option 1\nOption 2",
                     },
                 },
+                {
+                    block_id: 'deadlineDate',
+                    type: "section",
+                    text: {
+                        type: "mrkdwn",
+                        text: "Pick a date for the poll deadline."
+                    },
+                    accessory: {
+                        type: "datepicker",
+                        initial_date: "2021-12-17",
+                        placeholder: {
+                            type: "plain_text",
+                            text: "Select a date",
+                            emoji: true
+                        },
+                        action_id: "deadlineDate"
+                    }
+                },
+                {
+                    block_id: 'deadlineTime',
+                    type: "section",
+                    text: {
+                        type: "mrkdwn",
+                        text: "Pick time for the poll deadline."
+                    },
+                    accessory: {
+                        type: "timepicker",
+                        initial_time: "22:00",
+                        placeholder: {
+                            type: "plain_text",
+                            text: "Select time",
+                            emoji: true
+                        },
+                        action_id: "deadlineTime"
+                    }
+                }
             ],
         },
     })
