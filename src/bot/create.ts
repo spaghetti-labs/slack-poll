@@ -10,10 +10,12 @@ export async function createPoll(
         channelId,
         optionTexts,
         userId,
+        deadline
     }: {
         channelId: string,
         optionTexts: string[],
         userId,
+        deadline: Date
     }
 ) {
     const app = getSlackApp()
@@ -39,6 +41,7 @@ export async function createPoll(
         userId,
         options,
         voteRights,
+        deadline,
     })
     await poll.save()
 
@@ -50,7 +53,7 @@ export async function createPoll(
                 type: "section",
                 text: {
                     type: "mrkdwn",
-                    text: `<@${userId}> has started a new poll!`
+                    text: `<@${userId}> has started a new poll! Ends on ${deadline.toLocaleDateString("en-US", {weekday: "short", year: "numeric", month:"short", day:"2-digit", hour12 : true, hour: "2-digit", minute: "2-digit", second: "2-digit"})}`
                 }
             },
             ...options.map(

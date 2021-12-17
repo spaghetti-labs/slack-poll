@@ -7,7 +7,7 @@ app.shortcut("poll/create-poll", async ({ shortcut, ack }) => {
     if (shortcut.type !== 'message_action') {
         return
     }
-    
+
     const message = shortcut.message
     if (message.type !== 'message') {
         return
@@ -44,6 +44,7 @@ app.shortcut("poll/create-poll", async ({ shortcut, ack }) => {
         channelId: shortcut.channel.id,
         optionTexts,
         userId: shortcut.user.id,
+        deadline: new Date()
     })
 
     await ack()
