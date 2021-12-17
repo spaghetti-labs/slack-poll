@@ -13,6 +13,12 @@ export class PollEntity extends BaseEntity {
     })
     userId: string
 
+    @Column('datetime', {
+        name: 'deadline',
+        nullable: false,
+    })
+    deadline: Date
+
     @OneToMany(() => OptionEntity, option => option.poll, { cascade: true })
     options: OptionEntity[]
 
