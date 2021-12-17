@@ -32,7 +32,7 @@ app.view(/.*/, async ({ view, ack, body: { user } }) => {
         channelId: channel,
         optionTexts,
         userId: user.id,
-        deadline
+        deadline,
     })
 
     await ack()

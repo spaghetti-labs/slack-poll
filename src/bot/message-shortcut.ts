@@ -44,7 +44,7 @@ app.shortcut("poll/create-poll", async ({ shortcut, ack }) => {
         channelId: shortcut.channel.id,
         optionTexts,
         userId: shortcut.user.id,
-        deadline: new Date()
+        deadline: new Date(),
     })
 
     await ack()

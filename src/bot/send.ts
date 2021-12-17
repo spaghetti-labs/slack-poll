@@ -21,16 +21,20 @@ app.action(/^poll\/.*\/send$/, async ({ action, ack, body }) => {
     const poll = option.poll
 
     if(new Date() > poll.deadline) {
-        body.message.blocks = [body.message.blocks[0], {
-			"type": "context",
-			"elements": [
-				{
-					"type": "plain_text",
-					"text": "DEADLINED!",
-					"emoji": true
-				}
-			]
-		}, body.message.blocks[body.message.blocks.length - 1]]
+        body.message.blocks = [
+            body.message.blocks[0],
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "plain_text",
+                        "text": "The poll has expired.",
+                        "emoji": true,
+                    },
+                ],
+            },
+            body.message.blocks[body.message.blocks.length - 1],
+        ]
 
         await app.client.chat.update({
             channel: body.channel.id,
