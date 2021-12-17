@@ -15,8 +15,16 @@ app.view(/.*/, async ({ view, ack, body: { user } }) => {
         .filter(line => line.length > 0)
 
     const channel = view.state.values.channel.channel.selected_conversation
+
+    const deadlineDate = view.state.values.deadlineDate.deadlineDate.selected_date
+    const deadlineTime = view.state.values.deadlineTime.deadlineTime.selected_time
+    const deadline = new Date(Date.parse(`${deadlineDate} ${deadlineTime}`))
     
     if (optionTexts.length < 2) {
+        return
+    }
+
+    if(new Date() > deadline) {
         return
     }
 
@@ -24,6 +32,7 @@ app.view(/.*/, async ({ view, ack, body: { user } }) => {
         channelId: channel,
         optionTexts,
         userId: user.id,
+        deadline
     })
 
     await ack()
