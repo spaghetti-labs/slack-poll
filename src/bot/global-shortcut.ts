@@ -1,11 +1,21 @@
 import { getSlackApp } from "../slack"
+import moment from "moment-timezone"
 
 const app = getSlackApp()
 
-app.shortcut("poll/create-poll-form", async ({ shortcut, ack }) => {
+app.shortcut("poll/create-poll-form", async ({ shortcut, ack, body: { user } }) => {
     if (shortcut.type !== 'shortcut') {
         return
     }
+
+    const userInfo = await app.client.users.info({user: user.id})
+    if(!userInfo.ok) {
+        return
+    }
+    
+    const momentTodayNextHourUTC = moment.tz(userInfo?.user.tz).add(1, "day").add(1, "hour").startOf('hour')
+    const initialDateStr = momentTodayNextHourUTC.format("YYYY-MM-DD")
+    const initialTimeStr = momentTodayNextHourUTC.format("HH:mm")
 
     await app.client.views.open({
         trigger_id: shortcut.trigger_id,
@@ -53,39 +63,39 @@ app.shortcut("poll/create-poll-form", async ({ shortcut, ack }) => {
                 },
                 {
                     block_id: 'deadlineDate',
-                    type: "section",
-                    text: {
-                        type: "mrkdwn",
-                        text: "Pick a date for the poll deadline."
-                    },
-                    accessory: {
+                    type: "input",
+                    element: {
                         type: "datepicker",
-                        initial_date: "2021-12-17",
+                        initial_date: initialDateStr,
                         placeholder: {
                             type: "plain_text",
                             text: "Select a date",
-                            emoji: true
+                            emoji: true,
                         },
-                        action_id: "deadlineDate"
-                    }
+                        action_id: "deadlineDate",
+                    },
+                    label: {
+                        type: "plain_text",
+                        text: "Deadline date",
+                    },
                 },
                 {
                     block_id: 'deadlineTime',
-                    type: "section",
-                    text: {
-                        type: "mrkdwn",
-                        text: "Pick time for the poll deadline."
-                    },
-                    accessory: {
+                    type: "input",
+                    element: {
                         type: "timepicker",
-                        initial_time: "22:00",
+                        initial_time: initialTimeStr,
                         placeholder: {
                             type: "plain_text",
                             text: "Select time",
-                            emoji: true
+                            emoji: true,
                         },
-                        action_id: "deadlineTime"
-                    }
+                        action_id: "deadlineTime",
+                    },
+                    label: {
+                        type: "plain_text",
+                        text: "Deadline time",
+                    },
                 }
             ],
         },

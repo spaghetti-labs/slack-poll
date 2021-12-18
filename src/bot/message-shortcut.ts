@@ -1,5 +1,6 @@
 import { getSlackApp } from "../slack"
 import { createPoll } from "./create"
+import moment from "moment"
 
 const app = getSlackApp()
 
@@ -44,7 +45,7 @@ app.shortcut("poll/create-poll", async ({ shortcut, ack }) => {
         channelId: shortcut.channel.id,
         optionTexts,
         userId: shortcut.user.id,
-        deadline: new Date(),
+        deadlineUTC: moment.utc(),
     })
 
     await ack()
