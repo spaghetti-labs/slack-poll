@@ -11,21 +11,23 @@
         "image-push": "docker push gcr.io/contenta-ai/slack-poll:latest"
     },
     "dependencies": {
+        "@slack/bolt": "^3.8.1",
+        "dotenv": "^10.0.0",
+        "moment": "^2.29.1",
+        "moment-timezone": "^0.5.34",
+        "reflect-metadata": "^0.1.13",
         "sqlite3": "^5.0.2",
         "typeorm": "^0.2.41",
-        "reflect-metadata": "^0.1.13",
-        "yargs": "^17.2.1",
-        "@slack/bolt": "^3.8.1",
         "uuid": "^8.3.2",
-        "dotenv": "^10.0.0"
+        "yargs": "^17.2.1"
     },
     "devDependencies": {
-        "typescript": "^4.5.2",
         "@types/node": "^16.11.10",
         "@types/sqlite3": "^3.1.7",
-        "ts-node": "^10.4.0",
-        "nodemon": "^2.0.15",
+        "@types/uuid": "^8.3.3",
         "@types/yargs": "^17.0.7",
-        "@types/uuid": "^8.3.3"
+        "nodemon": "^2.0.15",
+        "ts-node": "^10.4.0",
+        "typescript": "^4.5.2"
     }
 }
