@@ -1,11 +1,21 @@
 import { getSlackApp } from "../slack"
+import moment from "moment-timezone"
 
 const app = getSlackApp()
 
-app.shortcut("poll/create-poll-form", async ({ shortcut, ack }) => {
+app.shortcut("poll/create-poll-form", async ({ shortcut, ack, body: { user } }) => {
     if (shortcut.type !== 'shortcut') {
         return
     }
+
+    const userInfo = await app.client.users.info({user: user.id})
+    if(!userInfo.ok) {
+        return
+    }
+    
+    const momentTomorrowNextHourUTC = moment.tz(userInfo?.user.tz).add(1, "day").add(1, "hour").startOf('hour')
+    const initialDateStr = momentTomorrowNextHourUTC.format("YYYY-MM-DD")
+    const initialTimeStr = momentTomorrowNextHourUTC.format("HH:mm")
 
     await app.client.views.open({
         trigger_id: shortcut.trigger_id,
@@ -51,6 +61,42 @@ app.shortcut("poll/create-poll-form", async ({ shortcut, ack }) => {
                         initial_value: "Option 1\nOption 2",
                     },
                 },
+                {
+                    block_id: 'deadlineDate',
+                    type: "input",
+                    element: {
+                        type: "datepicker",
+                        initial_date: initialDateStr,
+                        placeholder: {
+                            type: "plain_text",
+                            text: "Select a date",
+                            emoji: true,
+                        },
+                        action_id: "deadlineDate",
+                    },
+                    label: {
+                        type: "plain_text",
+                        text: "Deadline date",
+                    },
+                },
+                {
+                    block_id: 'deadlineTime',
+                    type: "input",
+                    element: {
+                        type: "timepicker",
+                        initial_time: initialTimeStr,
+                        placeholder: {
+                            type: "plain_text",
+                            text: "Select time",
+                            emoji: true,
+                        },
+                        action_id: "deadlineTime",
+                    },
+                    label: {
+                        type: "plain_text",
+                        text: "Deadline time",
+                    },
+                }
             ],
         },
     })

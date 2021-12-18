@@ -1,4 +1,6 @@
 import { SectionBlock } from "@slack/types"
+import moment from "moment"
+import { Moment } from "moment"
 import { v4 } from "uuid"
 import { OptionEntity } from "../entities/option"
 import { PollEntity } from "../entities/poll"
@@ -10,10 +12,12 @@ export async function createPoll(
         channelId,
         optionTexts,
         userId,
+        deadlineUTC,
     }: {
         channelId: string,
         optionTexts: string[],
-        userId,
+        userId: string,
+        deadlineUTC: Moment,
     }
 ) {
     const app = getSlackApp()
@@ -45,8 +49,13 @@ export async function createPoll(
         userId,
         options,
         voteRights,
+        deadline: deadlineUTC.toDate(),
     })
     await poll.save()
+    
+    const expirationDateUTCStr = deadlineUTC.format("ddd, MMM DD YYYY, hh:mm A [GMT]")
+    const expirationTimeToNow = moment.utc().to(deadlineUTC)
+    const expirationDateUTCStrWithToNow = `${expirationDateUTCStr} (${expirationTimeToNow})`
 
     await app.client.chat.postMessage({
         channel: channelId,
@@ -56,7 +65,7 @@ export async function createPoll(
                 type: "section",
                 text: {
                     type: "mrkdwn",
-                    text: `<@${userId}> has started a new poll!`
+                    text: `<@${userId}> has started a new poll!\nEnds on ${expirationDateUTCStrWithToNow}`,
                 }
             },
             ...options.map(
