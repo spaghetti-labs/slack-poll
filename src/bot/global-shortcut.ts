@@ -13,9 +13,9 @@ app.shortcut("poll/create-poll-form", async ({ shortcut, ack, body: { user } }) 
         return
     }
     
-    const momentTodayNextHourUTC = moment.tz(userInfo?.user.tz).add(1, "day").add(1, "hour").startOf('hour')
-    const initialDateStr = momentTodayNextHourUTC.format("YYYY-MM-DD")
-    const initialTimeStr = momentTodayNextHourUTC.format("HH:mm")
+    const momentTomorrowNextHourUTC = moment.tz(userInfo?.user.tz).add(1, "day").add(1, "hour").startOf('hour')
+    const initialDateStr = momentTomorrowNextHourUTC.format("YYYY-MM-DD")
+    const initialTimeStr = momentTomorrowNextHourUTC.format("HH:mm")
 
     await app.client.views.open({
         trigger_id: shortcut.trigger_id,
